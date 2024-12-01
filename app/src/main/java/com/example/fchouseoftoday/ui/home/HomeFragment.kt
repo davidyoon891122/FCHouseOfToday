@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.fchouseoftoday.R
 import com.example.fchouseoftoday.data.ArticleModel
 import com.example.fchouseoftoday.databinding.FragmentHomeBinding
@@ -23,20 +24,35 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
         binding = FragmentHomeBinding.bind(view)
 
-        val db = Firebase.firestore
+        setupWriteButton(view)
 
-        db.collection("articles").document("2xZK5PgFycebyjvusO9E")
+        val articleAdapter = HomeArticleAdapter {
+            it.articleId?.let { articleId ->
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToArticleFragment(
+                        articleId = articleId
+                    )
+                )
+            }
+        }
+
+        binding.homeRecyclerView.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = articleAdapter
+        }
+
+        Firebase.firestore.collection("articles")
             .get()
             .addOnSuccessListener { result ->
-                val article = result.toObject<ArticleModel>()
+                val list = result.map {
+                    it.toObject<ArticleModel>()
+                }
 
-                Log.e("HomeFragment", article.toString())
+                articleAdapter.submitList(list)
             }
             .addOnFailureListener {
-                it.printStackTrace()
-            }
 
-        setupWriteButton(view)
+            }
     }
 
     private fun setupWriteButton(view: View) {
