@@ -2,6 +2,7 @@ package com.example.fchouseoftoday.ui.bookmark
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +15,8 @@ class BookmarkArticleAdapter(val onItemClicked: (ArticleModel) -> Unit): ListAda
     inner class ViewHolder(private val binding: ItemArticleBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(articleModel: ArticleModel) {
             binding.descriptionTextView.text = articleModel.description
+            binding.bookmarkImageButton.isVisible = false
+
 
             Glide.with(binding.thumbnailImageView)
                 .load(articleModel.imageUrl)

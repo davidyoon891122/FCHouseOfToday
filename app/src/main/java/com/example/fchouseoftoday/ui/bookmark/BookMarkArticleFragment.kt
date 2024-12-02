@@ -3,6 +3,8 @@ package com.example.fchouseoftoday.ui.bookmark
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.fchouseoftoday.R
 import com.example.fchouseoftoday.data.ArticleModel
@@ -22,7 +24,14 @@ class BookMarkArticleFragment: Fragment(R.layout.fragment_bookmark) {
 
         binding = FragmentBookmarkBinding.bind(view)
 
+        binding.toolbar.setupWithNavController(findNavController())
+
         bookmarkAdapter = BookmarkArticleAdapter {
+            findNavController().navigate(
+                BookMarkArticleFragmentDirections.actionBookMarkArticleFragmentToArticleFragment(
+                    it.articleId.orEmpty()
+                )
+            )
 
         }
 

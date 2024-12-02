@@ -6,21 +6,38 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.fchouseoftoday.R
 import com.example.fchouseoftoday.data.ArticleModel
 import com.example.fchouseoftoday.databinding.ItemArticleBinding
 
-class HomeArticleAdapter(val onItemClicked: (ArticleModel) -> Unit): ListAdapter<ArticleModel, HomeArticleAdapter.ViewHolder>(diffUtil) {
+class HomeArticleAdapter(val onItemClicked: (ArticleItem) -> Unit, val onBookmarkClicked: (String, Boolean) -> Unit): ListAdapter<ArticleItem, HomeArticleAdapter.ViewHolder>(diffUtil) {
 
     inner class ViewHolder(private val binding: ItemArticleBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(articleModel: ArticleModel) {
-            binding.descriptionTextView.text = articleModel.description
+        fun bind(articleItem: ArticleItem) {
+            binding.descriptionTextView.text = articleItem.description
 
             Glide.with(binding.thumbnailImageView)
-                .load(articleModel.imageUrl)
+                .load(articleItem.imageUrl)
                 .into(binding.thumbnailImageView)
 
             binding.root.setOnClickListener {
-                onItemClicked(articleModel)
+                onItemClicked(articleItem)
+            }
+
+            if(articleItem.isBookMark) {
+                binding.bookmarkImageButton.setBackgroundResource(R.drawable.baseline_bookmark_24)
+            } else {
+                binding.bookmarkImageButton.setBackgroundResource(R.drawable.baseline_bookmark_border_24)
+            }
+
+            binding.bookmarkImageButton.setOnClickListener {
+                onBookmarkClicked.invoke(articleItem.articleId, !articleItem.isBookMark)
+                articleItem.isBookMark = articleItem.isBookMark.not()
+                if(articleItem.isBookMark) {
+                    binding.bookmarkImageButton.setBackgroundResource(R.drawable.baseline_bookmark_24)
+                } else {
+                    binding.bookmarkImageButton.setBackgroundResource(R.drawable.baseline_bookmark_border_24)
+                }
             }
         }
     }
@@ -40,12 +57,12 @@ class HomeArticleAdapter(val onItemClicked: (ArticleModel) -> Unit): ListAdapter
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<ArticleModel>() {
-            override fun areItemsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
+        val diffUtil = object : DiffUtil.ItemCallback<ArticleItem>() {
+            override fun areItemsTheSame(oldItem: ArticleItem, newItem: ArticleItem): Boolean {
                 return oldItem.articleId == newItem.articleId
             }
 
-            override fun areContentsTheSame(oldItem: ArticleModel, newItem: ArticleModel): Boolean {
+            override fun areContentsTheSame(oldItem: ArticleItem, newItem: ArticleItem): Boolean {
                 return oldItem == newItem
             }
 
