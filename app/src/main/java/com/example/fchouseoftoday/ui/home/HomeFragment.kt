@@ -18,6 +18,7 @@ import com.google.firebase.ktx.Firebase
 class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private lateinit var binding: FragmentHomeBinding
+    private lateinit var articleAdapter: HomeArticleAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -25,21 +26,9 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         binding = FragmentHomeBinding.bind(view)
 
         setupWriteButton(view)
+        setupBookMarkButton(view)
+        setupRecyclerView()
 
-        val articleAdapter = HomeArticleAdapter {
-            it.articleId?.let { articleId ->
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToArticleFragment(
-                        articleId = articleId
-                    )
-                )
-            }
-        }
-
-        binding.homeRecyclerView.apply {
-            layoutManager = GridLayoutManager(context, 2)
-            adapter = articleAdapter
-        }
 
         Firebase.firestore.collection("articles")
             .get()
@@ -64,6 +53,29 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 Snackbar.make(view, "로그인 후 사용해 주세요.", Snackbar.LENGTH_SHORT).show()
             }
 
+        }
+    }
+
+    private fun setupBookMarkButton(view: View) {
+        binding.bookmarkImageButton.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToBookMarkArticleFragment())
+        }
+    }
+
+    private fun setupRecyclerView() {
+        articleAdapter = HomeArticleAdapter {
+            it.articleId?.let { articleId ->
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToArticleFragment(
+                        articleId = articleId
+                    )
+                )
+            }
+        }
+
+        binding.homeRecyclerView.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = articleAdapter
         }
     }
 
